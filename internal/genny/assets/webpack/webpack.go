@@ -1,6 +1,9 @@
 package webpack
 
 import (
+	"embed"
+	_ "embed"
+
 	"fmt"
 	"os/exec"
 	"path/filepath"
@@ -8,21 +11,21 @@ import (
 
 	"github.com/gobuffalo/genny/v2"
 	"github.com/gobuffalo/genny/v2/gogen"
-	"github.com/gobuffalo/packr/v2"
+	"github.com/paganotoni/fsbox"
 )
 
-// BinPath is the path to the local install of webpack
-var BinPath = func() string {
-	s := filepath.Join("node_modules", ".bin", "webpack")
-	if runtime.GOOS == "windows" {
-		s += ".cmd"
-	}
-	return s
-}()
+var (
+	//go:embed templates
+	templates embed.FS
 
-// Templates used for generating webpack
-// (exported mostly for the "fix" command)
-var Templates = packr.New("github.com/gobuffalo/cli/internal/genny/assets/webpack", "../webpack/templates")
+	BinPath = func() string {
+		s := filepath.Join("node_modules", ".bin", "webpack")
+		if runtime.GOOS == "windows" {
+			s += ".cmd"
+		}
+		return s
+	}()
+)
 
 // New generator for creating webpack asset files
 func New(opts *Options) (*genny.Generator, error) {
@@ -45,14 +48,14 @@ func New(opts *Options) (*genny.Generator, error) {
 		return nil
 	})
 
-	g.Box(Templates)
+	g.Box(fsbox.New(templates, "templates", fsbox.OptionFSIgnoreGoEnv))
 
 	data := map[string]interface{}{
 		"opts": opts,
 	}
 	t := gogen.TemplateTransformer(data, gogen.TemplateHelpers)
 	g.Transformer(t)
-	g.Transformer(genny.Dot())
+	g.Transformer(genny.Replace("dot-", "."))
 
 	g.RunFn(func(r *genny.Runner) error {
 		return installPkgs(r, opts)

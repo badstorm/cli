@@ -29,9 +29,6 @@ func (opts *Options) Validate() error {
 		if opts.Docker.App.IsZero() {
 			opts.Docker.App = opts.App
 		}
-		if err := opts.Docker.Validate(); err != nil {
-			return err
-		}
 	}
 
 	if opts.Webpack != nil {

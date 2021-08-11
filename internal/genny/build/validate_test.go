@@ -1,13 +1,17 @@
 package build
 
 import (
+	"embed"
 	"testing"
 
 	"github.com/gobuffalo/genny/v2/gentest"
 	"github.com/gobuffalo/packd"
-	"github.com/gobuffalo/packr/v2"
+	"github.com/paganotoni/fsbox"
 	"github.com/stretchr/testify/require"
 )
+
+//go:embed testdata/template_validator
+var validatefs embed.FS
 
 var goodTemplates = func() packd.Box {
 	box := packd.NewMemoryBox()
@@ -31,7 +35,7 @@ func Test_TemplateValidator_Good(t *testing.T) {
 func Test_TemplateValidator_Bad(t *testing.T) {
 	r := require.New(t)
 
-	box := packr.New("../build/_fixtures/template_validator/bad", "../build/_fixtures/template_validator/bad")
+	box := fsbox.New(validatefs, "testdata/template_validator/bad")
 	tvs := []TemplateValidator{PlushValidator}
 
 	run := gentest.NewRunner()

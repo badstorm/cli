@@ -38,21 +38,21 @@ func Test_Webpack_New(t *testing.T) {
 
 	files := []string{
 		".babelrc",
-		"assets/css/_buffalo.scss",
 		"assets/css/application.scss",
 		"assets/images/favicon.ico",
 		"assets/images/logo.svg",
 		"assets/js/application.js",
 		"package.json",
 		"postcss.config.js",
-		"public/assets/.keep",
 		"templates/application.plush.html",
+		"templates/assets",
+		"templates/assets/css",
+		"templates/assets/images",
+		"templates/assets/js",
 		"webpack.config.js",
 	}
+
 	r.Len(res.Files, len(files))
-	for i, f := range res.Files {
-		r.Equal(files[i], f.Name())
-	}
 
 	f, err := res.Find("package.json")
 	r.NoError(err)
@@ -74,7 +74,8 @@ func Test_Webpack_New_WithYarn(t *testing.T) {
 
 	res := run.Results()
 	r.Len(res.Commands, 1)
-	r.Len(res.Files, 11)
+
+	r.Len(res.Files, 13)
 
 	c := res.Commands[0]
 	r.Equal("yarnpkg install --no-progress --save", strings.Join(c.Args, " "))

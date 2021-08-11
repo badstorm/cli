@@ -73,6 +73,7 @@ func Test_New_Docker(t *testing.T) {
 	gg, err := New(&Options{
 		Docker: &docker.Options{},
 	})
+
 	r.NoError(err)
 
 	run := gentest.NewRunner()

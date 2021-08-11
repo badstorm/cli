@@ -1,16 +1,22 @@
 package build
 
 import (
+	"embed"
 	"time"
 
 	"github.com/gobuffalo/cli/internal/runtime"
+	"github.com/paganotoni/fsbox"
 
 	"github.com/gobuffalo/events"
 	"github.com/gobuffalo/genny/v2"
 	"github.com/gobuffalo/genny/v2/plushgen"
-	"github.com/gobuffalo/packr/v2"
 	"github.com/gobuffalo/packr/v2/jam"
 	"github.com/gobuffalo/plush/v4"
+)
+
+var (
+	//go:embed templates
+	templates embed.FS
 )
 
 // New generator for building a Buffalo application
@@ -41,7 +47,7 @@ func New(opts *Options) (*genny.Generator, error) {
 	g.RunFn(transformMain(opts))
 
 	// add any necessary templates for the build
-	box := packr.New("github.com/gobuffalo/buffalo@v0.15.6/genny/build", "../build/templates")
+	box := fsbox.New(templates, "templates", fsbox.OptionFSIgnoreGoEnv)
 	if err := g.Box(box); err != nil {
 		return g, err
 	}

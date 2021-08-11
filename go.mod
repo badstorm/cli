@@ -27,6 +27,7 @@ require (
 	github.com/markbates/refresh v1.11.1
 	github.com/markbates/safe v1.0.1
 	github.com/markbates/sigtx v1.0.0
+	github.com/paganotoni/fsbox v1.1.3
 	github.com/sirupsen/logrus v1.8.1
 	github.com/spf13/cobra v1.2.1
 	github.com/spf13/pflag v1.0.5

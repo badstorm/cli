@@ -1,15 +1,21 @@
 package web
 
 import (
+	"embed"
 	"html/template"
 
 	"github.com/gobuffalo/cli/internal/genny/assets/standard"
 	"github.com/gobuffalo/cli/internal/genny/assets/webpack"
 	"github.com/gobuffalo/cli/internal/genny/newapp/core"
+	"github.com/paganotoni/fsbox"
 
 	"github.com/gobuffalo/genny/v2"
 	"github.com/gobuffalo/genny/v2/gogen"
-	"github.com/gobuffalo/packr/v2"
+)
+
+var (
+	//go:embed templates
+	templates embed.FS
 )
 
 // New generator for creating a Buffalo Web application
@@ -24,7 +30,9 @@ func New(opts *Options) (*genny.Group, error) {
 	}
 
 	g := genny.New()
-	g.Transformer(genny.Dot())
+	g.Transformer(genny.Replace("dot-", "."))
+	g.Transformer(genny.Replace("[und]_", "_"))
+
 	data := map[string]interface{}{
 		"opts": opts,
 	}
@@ -33,7 +41,7 @@ func New(opts *Options) (*genny.Group, error) {
 
 	t := gogen.TemplateTransformer(data, helpers)
 	g.Transformer(t)
-	g.Box(packr.New("github.com/gobuffalo/buffalo:genny/newapp/web", "../web/templates"))
+	g.Box(fsbox.New(templates, "templates", fsbox.OptionFSIgnoreGoEnv))
 
 	gg.Add(g)
 

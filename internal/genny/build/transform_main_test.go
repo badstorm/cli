@@ -13,7 +13,10 @@ func Test_transformMain(t *testing.T) {
 	r := require.New(t)
 
 	run := gentest.NewRunner()
-	run.Disk.Add(genny.NewFile("main.go", strings.NewReader(coke.String("main.go"))))
+	rd, err := coke.FindString("main.go")
+	r.NoError(err)
+
+	run.Disk.Add(genny.NewFile("main.go", strings.NewReader(rd)))
 
 	opts := &Options{}
 	run.WithRun(transformMain(opts))

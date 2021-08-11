@@ -1,6 +1,7 @@
 package standard
 
 import (
+	"fmt"
 	"testing"
 
 	"github.com/gobuffalo/genny/v2"
@@ -34,9 +35,19 @@ func Test_New(t *testing.T) {
 		"public/assets/images/favicon.ico",
 		"public/assets/images/logo.svg",
 		"templates/application.plush.html",
+		"templates/public",
+		"templates/public/assets",
+		"templates/public/assets/images",
 	}
 
-	r.Len(res.Files, len(files))
+	// for i, f := range res.Files {
+	// 	r.Equal(files[i], f.Name())
+	// }
+
+	for _, v := range res.Files {
+		fmt.Println(v.Name())
+	}
+
 	for i, f := range res.Files {
 		r.Equal(files[i], f.Name())
 	}

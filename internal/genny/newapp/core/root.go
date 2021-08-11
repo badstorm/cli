@@ -1,13 +1,19 @@
 package core
 
 import (
+	"embed"
 	"html/template"
 	"os/exec"
 
 	"github.com/BurntSushi/toml"
 	"github.com/gobuffalo/genny/v2"
 	"github.com/gobuffalo/genny/v2/gogen"
-	"github.com/gobuffalo/packr/v2"
+	"github.com/paganotoni/fsbox"
+)
+
+var (
+	//go:embed templates
+	templates embed.FS
 )
 
 func rootGenerator(opts *Options) (*genny.Generator, error) {
@@ -20,10 +26,11 @@ func rootGenerator(opts *Options) (*genny.Generator, error) {
 
 	g.Command(exec.Command("go", "mod", "init", opts.App.PackagePkg))
 
-	g.Transformer(genny.Dot())
+	g.Transformer(genny.Replace("dot-", "."))
 
 	// add common templates
-	if err := g.Box(packr.New("buffalo:genny:newapp:core", "../core/templates")); err != nil {
+	err := g.Box(fsbox.New(templates, "templates", fsbox.OptionFSIgnoreGoEnv))
+	if err != nil {
 		return g, err
 	}
 

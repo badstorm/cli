@@ -1,13 +1,20 @@
 package api
 
 import (
+	"embed"
+	_ "embed"
 	"html/template"
 
 	"github.com/gobuffalo/cli/internal/genny/newapp/core"
+	"github.com/paganotoni/fsbox"
 
 	"github.com/gobuffalo/genny/v2"
 	"github.com/gobuffalo/genny/v2/gogen"
-	"github.com/gobuffalo/packr/v2"
+)
+
+var (
+	//go:embed templates
+	templates embed.FS
 )
 
 // New generator for creating a Buffalo API application
@@ -30,7 +37,7 @@ func New(opts *Options) (*genny.Group, error) {
 
 	t := gogen.TemplateTransformer(data, helpers)
 	g.Transformer(t)
-	g.Box(packr.New("buffalo:genny:newapp:api", "../api/templates"))
+	g.Box(fsbox.New(templates, "templates", fsbox.OptionFSIgnoreGoEnv))
 
 	gg.Add(g)
 

@@ -1,11 +1,18 @@
 package mail
 
 import (
+	"embed"
+	_ "embed"
 	"text/template"
 
 	"github.com/gobuffalo/genny/v2"
 	"github.com/gobuffalo/genny/v2/gogen"
-	"github.com/gobuffalo/packr/v2"
+	"github.com/paganotoni/fsbox"
+)
+
+var (
+	//go:embed init/templates
+	initTemplates embed.FS
 )
 
 // New mailer generator. It will init the mailers directory if it doesn't already exist
@@ -43,11 +50,14 @@ func New(opts *Options) (*genny.Group, error) {
 func initGenerator(opts *Options) (*genny.Generator, error) {
 	g := genny.New()
 
-	g.Box(packr.New("github.com/gobuffalo/cli/internal/genny/mail/init/templates", "../mail/init/templates"))
+	box := fsbox.New(initTemplates, "init/templates", fsbox.OptionFSIgnoreGoEnv)
+	g.Box(box)
+
 	h := template.FuncMap{}
 	data := map[string]interface{}{
 		"opts": opts,
 	}
+
 	t := gogen.TemplateTransformer(data, h)
 	g.Transformer(t)
 
@@ -55,6 +65,7 @@ func initGenerator(opts *Options) (*genny.Generator, error) {
 		_, err := r.FindFile("mailers/mailers.go")
 		return err != nil
 	}
+
 	opts.Name.Titleize()
 	return g, nil
 }

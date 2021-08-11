@@ -1,15 +1,33 @@
 package actions
 
 import (
+	"embed"
 	"fmt"
 	"strings"
 	"testing"
 
 	"github.com/gobuffalo/genny/v2"
 	"github.com/gobuffalo/genny/v2/gentest"
-	packr "github.com/gobuffalo/packr/v2"
 	"github.com/google/go-cmp/cmp"
+	"github.com/paganotoni/fsbox"
 	"github.com/stretchr/testify/require"
+)
+
+var (
+	//go:embed testdata/inputs/clean
+	cleanInput embed.FS
+
+	//go:embed testdata/inputs/existing
+	existingInput embed.FS
+
+	//go:embed testdata/outputs/clean
+	cleanOutput embed.FS
+
+	//go:embed testdata/outputs/multi
+	multiOutput embed.FS
+
+	//go:embed testdata/outputs/existing
+	existingOutput embed.FS
 )
 
 func compare(a, b string) bool {
@@ -27,8 +45,10 @@ func compare(a, b string) bool {
 }
 
 func runner() *genny.Runner {
+	box := fsbox.New(cleanInput, "testdata/inputs/clean")
 	run := gentest.NewRunner()
-	run.Disk.AddBox(packr.New("actions/start/test", "../actions/_fixtures/inputs/clean"))
+	run.Disk.AddBox(box)
+
 	return run
 }
 
@@ -47,20 +67,21 @@ func Test_New(t *testing.T) {
 	r.NoError(run.Run())
 
 	res := run.Results()
-
 	r.Len(res.Commands, 0)
-	// r.Len(res.Files, 4)
 
-	box := packr.New("genny/actions/Test_New", "../actions/_fixtures/outputs/clean")
-
-	files := []string{"actions/user.go.tmpl", "actions/app.go.tmpl", "actions/user_test.go.tmpl", "templates/user/index.plush.html"}
+	box := fsbox.New(cleanOutput, "testdata/outputs/clean")
+	files := []string{
+		"actions/user.go.tmpl",
+		"actions/app.go.tmpl",
+		"actions/user_test.go.tmpl",
+		"templates/user/index.plush.html",
+	}
 
 	for _, s := range files {
 		x, err := box.FindString(s)
 		r.NoError(err)
 		f, err := res.Find(strings.TrimSuffix(s, ".tmpl"))
 		r.NoError(err)
-		fmt.Printf("\nfile %s", s)
 		r.True(compare(x, f.String()))
 	}
 }
@@ -84,16 +105,20 @@ func Test_New_Multi(t *testing.T) {
 
 	r.Len(res.Commands, 0)
 
-	box := packr.New("genny/actions/Test_New_Multi", "../actions/_fixtures/outputs/multi")
-
-	files := []string{"actions/user.go.tmpl", "actions/app.go.tmpl", "actions/user_test.go.tmpl", "templates/user/show.plush.html", "templates/user/edit.plush.html"}
+	box := fsbox.New(cleanInput, "testdata/outputs/multi")
+	files := []string{
+		"actions/user.go.tmpl",
+		"actions/app.go.tmpl",
+		"actions/user_test.go.tmpl",
+		"templates/user/show.plush.html",
+		"templates/user/edit.plush.html",
+	}
 
 	for _, s := range files {
 		x, err := box.FindString(s)
 		r.NoError(err)
 		f, err := res.Find(strings.TrimSuffix(s, ".tmpl"))
 		r.NoError(err)
-		fmt.Printf("\nfile %s", f)
 		r.True(compare(x, f.String()))
 	}
 }
@@ -108,11 +133,13 @@ func Test_New_Multi_Existing(t *testing.T) {
 	r.NoError(err)
 
 	run := gentest.NewRunner()
-	ins := packr.New("Test_New_Multi_Existing_input", "../actions/_fixtures/inputs/existing")
+
+	ins := fsbox.New(existingInput, "testdata/inputs/existing")
 	for _, n := range ins.List() {
 		x, err := ins.FindString(n)
 		r.NoError(err)
 		n = strings.TrimSuffix(n, ".tmpl")
+		n = strings.TrimPrefix(n, "testdata/inputs/existing/")
 		run.Disk.Add(genny.NewFileS(n, x))
 	}
 	run.With(g)
@@ -124,9 +151,14 @@ func Test_New_Multi_Existing(t *testing.T) {
 
 	r.Len(res.Commands, 0)
 
-	box := packr.New("genny/actions/Test_New_Multi_Existing", "../actions/_fixtures/outputs/existing")
-
-	files := []string{"actions/user.go.tmpl", "actions/app.go.tmpl", "actions/user_test.go.tmpl", "templates/user/show.plush.html", "templates/user/edit.plush.html"}
+	box := fsbox.New(existingOutput, "testdata/outputs/existing")
+	files := []string{
+		"actions/user.go.tmpl",
+		"actions/app.go.tmpl",
+		"actions/user_test.go.tmpl",
+		"templates/user/show.plush.html",
+		"templates/user/edit.plush.html",
+	}
 
 	for _, s := range files {
 		x, err := box.FindString(s)

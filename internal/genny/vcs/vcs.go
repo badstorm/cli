@@ -1,11 +1,17 @@
 package vcs
 
 import (
+	"embed"
 	"fmt"
 	"os/exec"
 
 	"github.com/gobuffalo/genny/v2"
-	"github.com/gobuffalo/packr/v2"
+	"github.com/paganotoni/fsbox"
+)
+
+var (
+	//go:embed templates
+	templates embed.FS
 )
 
 // New generator for adding VCS to an application
@@ -20,7 +26,7 @@ func New(opts *Options) (*genny.Generator, error) {
 		return g, nil
 	}
 
-	box := packr.New("buffalo:genny:vcs", "../vcs/templates")
+	box := fsbox.New(templates, "templates", fsbox.OptionFSIgnoreGoEnv)
 	s, err := box.FindString("ignore.tmpl")
 	if err != nil {
 		return g, err

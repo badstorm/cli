@@ -20,22 +20,22 @@ func Test_New_NoMailers(t *testing.T) {
 
 	res := run.Results()
 	r.Len(res.Commands, 0)
-	r.Len(res.Files, 4)
+	r.Len(res.Files, 7)
 
-	f := res.Files[0]
+	f := res.Files[3]
 	r.Equal("mailers/foo.go", f.Name())
 	body := f.String()
 	r.Contains(body, `err := m.AddBody(r.HTML("foo.html"), render.Data{})`)
 
-	f = res.Files[1]
+	f = res.Files[4]
 	r.Equal("mailers/mailers.go", f.Name())
 
-	f = res.Files[2]
+	f = res.Files[5]
 	r.Equal("templates/mail/foo.plush.html", f.Name())
 	body = f.String()
 	r.Contains(body, `<h3>../templates/mail/foo.plush.html</h3>`)
 
-	f = res.Files[3]
+	f = res.Files[6]
 	r.Equal("templates/mail/layout.plush.html", f.Name())
 }
 

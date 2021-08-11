@@ -1,18 +1,24 @@
 package standard
 
 import (
+	"embed"
 	"strings"
 	"text/template"
 
 	"github.com/gobuffalo/genny/v2"
 	"github.com/gobuffalo/genny/v2/gogen"
-	"github.com/gobuffalo/packr/v2"
+	"github.com/paganotoni/fsbox"
+)
+
+var (
+	//go:embed templates
+	templates embed.FS
 )
 
 // New generator for creating basic asset files
 func New(opts *Options) (*genny.Generator, error) {
 	g := genny.New()
-	g.Box(packr.New("buffalo:genny:assets:standard", "../standard/templates"))
+	g.Box(fsbox.New(templates, "templates", fsbox.OptionFSIgnoreGoEnv))
 
 	data := map[string]interface{}{}
 	h := template.FuncMap{}

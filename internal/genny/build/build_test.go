@@ -1,6 +1,7 @@
 package build
 
 import (
+	"embed"
 	"os/exec"
 	"runtime"
 	"strings"
@@ -10,19 +11,28 @@ import (
 	"github.com/gobuffalo/genny/v2"
 	"github.com/gobuffalo/genny/v2/gentest"
 	"github.com/gobuffalo/meta"
-	"github.com/gobuffalo/packr/v2"
+	"github.com/paganotoni/fsbox"
 	"github.com/stretchr/testify/require"
 )
 
 // TODO: once `buffalo new` is converted to use genny
 // create an integration test that first generates a new application
 // and then tries to build using genny/build.
-var coke = packr.New("github.com/gobuffalo/cli/internal/genny/build/build_test", "../build/_fixtures/coke")
+var (
+	//go:embed testdata/coke
+	cokefs embed.FS
+
+	coke = fsbox.New(cokefs, "testdata/coke")
+)
 
 var cokeRunner = func() *genny.Runner {
 	run := gentest.NewRunner()
 	run.Disk.AddBox(coke)
-	run.Root = coke.Path
+
+	content, _ := coke.FindString("dependencies.json")
+	run.Disk.Add(genny.NewFileS("package.json", content))
+	run.Root = "testdata/coke"
+
 	return run
 }
 
