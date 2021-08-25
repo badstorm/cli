@@ -2,11 +2,12 @@ package info
 
 import (
 	"bytes"
+	"io/ioutil"
+	"os"
+	"path/filepath"
 	"testing"
 
 	"github.com/gobuffalo/clara/v2/genny/rx"
-
-	"github.com/gobuffalo/packd"
 
 	"github.com/gobuffalo/genny/v2/gentest"
 	"github.com/gobuffalo/meta"
@@ -14,10 +15,11 @@ import (
 )
 
 func Test_configs(t *testing.T) {
+	d := t.TempDir()
+	os.Chdir(d)
+
 	r := require.New(t)
-
 	run := gentest.NewRunner()
-
 	bb := &bytes.Buffer{}
 
 	app := meta.New(".")
@@ -26,10 +28,22 @@ func Test_configs(t *testing.T) {
 		Out: rx.NewWriter(bb),
 	}
 
-	box := packd.NewMemoryBox()
-	box.AddString("buffalo-app.toml", "app")
-	box.AddString("buffalo-plugins.toml", "plugins")
-	run.WithRun(configs(opts, box))
+	err := os.MkdirAll("config", 0777)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = ioutil.WriteFile(filepath.Join("config", "buffalo-app.toml"), []byte("app"), 0777)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	err = ioutil.WriteFile(filepath.Join("config", "buffalo-plugins.toml"), []byte("plugins"), 0777)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	run.WithRun(configs(opts, "config"))
 
 	r.NoError(run.Run())
 

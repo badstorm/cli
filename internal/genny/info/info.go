@@ -4,7 +4,6 @@ import (
 	"path/filepath"
 
 	"github.com/gobuffalo/genny/v2"
-	"github.com/gobuffalo/packr/v2"
 )
 
 // New returns a generator that performs buffalo
@@ -17,12 +16,8 @@ func New(opts *Options) (*genny.Generator, error) {
 	}
 
 	g.RunFn(appDetails(opts))
-
-	cBox := packr.Folder(filepath.Join(opts.App.Root, "config"))
-	g.RunFn(configs(opts, cBox))
-
-	aBox := packr.Folder(opts.App.Root)
-	g.RunFn(pkgChecks(opts, aBox))
+	g.RunFn(configs(opts, filepath.Join(opts.App.Root, "config")))
+	// g.RunFn(pkgChecks(opts, opts.App.Root))
 
 	return g, nil
 }

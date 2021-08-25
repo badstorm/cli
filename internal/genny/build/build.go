@@ -75,15 +75,6 @@ func New(opts *Options) (*genny.Generator, error) {
 		g.Merge(ag)
 	}
 
-	if opts.WithBuildDeps {
-		// mount the build time dependency generator
-		dg, err := buildDeps(opts)
-		if err != nil {
-			return g, err
-		}
-		g.Merge(dg)
-	}
-
 	// create the final go build command
 	c, err := buildCmd(opts)
 	if err != nil {
