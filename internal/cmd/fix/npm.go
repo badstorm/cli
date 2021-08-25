@@ -99,6 +99,7 @@ func PackageJSONCheck(r *Runner) error {
 			App: r.App,
 		},
 	})
+	
 	if err != nil {
 		return err
 	}

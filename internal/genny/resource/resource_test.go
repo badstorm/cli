@@ -1,9 +1,9 @@
 package resource
 
 import (
+	"embed"
 	"fmt"
 	"path"
-	"path/filepath"
 	"strings"
 	"testing"
 
@@ -12,8 +12,14 @@ import (
 	"github.com/gobuffalo/genny/v2"
 	"github.com/gobuffalo/genny/v2/gentest"
 	"github.com/gobuffalo/meta"
-	packr "github.com/gobuffalo/packr/v2"
+	"github.com/gobuffalo/packd"
+	"github.com/paganotoni/fsbox"
 	"github.com/stretchr/testify/require"
+)
+
+var (
+	//go:embed testdata
+	testdata embed.FS
 )
 
 type pass struct {
@@ -23,8 +29,8 @@ type pass struct {
 
 func runner() *genny.Runner {
 	run := gentest.NewRunner()
-	box := packr.New("./_fixtures/coke", "./_fixtures/coke")
-	box.Walk(func(path string, file packr.File) error {
+	box := fsbox.New(testdata, "testdata/coke")
+	box.Walk(func(path string, file packd.File) error {
 		path = strings.TrimSuffix(path, ".tmpl")
 		run.Disk.Add(genny.NewFile(path, file))
 		return nil
@@ -64,7 +70,7 @@ func Test_New(t *testing.T) {
 			c := res.Commands[0]
 			r.Equal("buffalo-pop pop g model widget name desc:nulls.Text", strings.Join(c.Args, " "))
 
-			r.Len(res.Files, 9)
+			r.Len(res.Files, 14)
 
 			nn := name.New(tt.Options.Name).Pluralize().String()
 			actions := []string{"_form", "index", "show", "new", "edit"}
@@ -74,7 +80,7 @@ func Test_New(t *testing.T) {
 				r.NoError(err)
 			}
 
-			exp := packr.Folder(filepath.Join("_fixtures", tt.Name))
+			exp := fsbox.New(testdata, path.Join("testdata", tt.Name))
 			gentest.CompareFiles(exp.List(), res.Files)
 
 			for _, n := range exp.List() {
@@ -133,7 +139,7 @@ func Test_New_SkipTemplates(t *testing.T) {
 				r.Error(err)
 			}
 
-			r.Len(res.Files, 3)
+			r.Len(res.Files, 5)
 		})
 	}
 }
@@ -174,7 +180,7 @@ func Test_New_API(t *testing.T) {
 				r.Error(err)
 			}
 
-			r.Len(res.Files, 3)
+			r.Len(res.Files, 5)
 		})
 	}
 }
@@ -208,7 +214,7 @@ func Test_New_UseModel(t *testing.T) {
 	c := res.Commands[0]
 	r.Equal("buffalo-pop pop g model user name desc:nulls.Text", strings.Join(c.Args, " "))
 
-	r.Len(res.Files, 9)
+	r.Len(res.Files, 14)
 
 	for _, s := range []string{"_form", "edit", "index", "new", "show"} {
 		p := path.Join("templates", "widgets", s+".plush.html")
@@ -244,7 +250,7 @@ func Test_New_SkipModel(t *testing.T) {
 	res := run.Results()
 
 	r.Len(res.Commands, 0)
-	r.Len(res.Files, 9)
+	r.Len(res.Files, 14)
 
 	f, err := res.Find("actions/widgets.go")
 	r.NoError(err)

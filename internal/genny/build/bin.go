@@ -4,13 +4,18 @@ import (
 	"os/exec"
 	"runtime"
 	"strings"
+
+	"github.com/gobuffalo/cli/internal/module"
 )
 
 func buildCmd(opts *Options) (*exec.Cmd, error) {
 	if len(opts.GoCommand) == 0 {
 		opts.GoCommand = "build"
 	}
-	buildArgs := []string{opts.GoCommand}
+
+	buildArgs := []string{
+		opts.GoCommand,
+	}
 
 	if len(opts.Mod) != 0 {
 		buildArgs = append(buildArgs, "-mod", opts.Mod)
@@ -46,9 +51,17 @@ func buildCmd(opts *Options) (*exec.Cmd, error) {
 	if len(opts.LDFlags) > 0 {
 		flags = append(flags, opts.LDFlags)
 	}
+
 	if len(flags) > 0 {
 		buildArgs = append(buildArgs, "-ldflags", strings.Join(flags, " "))
 	}
+
+	binFolder, err := module.FolderName()
+	if err != nil {
+		return nil, err
+	}
+
+	buildArgs = append(buildArgs, "./cmd/"+binFolder)
 
 	return exec.Command("go", buildArgs...), nil
 }

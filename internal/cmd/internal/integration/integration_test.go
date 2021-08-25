@@ -8,13 +8,10 @@ import (
 
 	"github.com/gobuffalo/cli/internal/cmd"
 	"github.com/gobuffalo/envy"
-	"github.com/gobuffalo/packr/v2/jam"
 	"github.com/markbates/safe"
 )
 
 func call(args []string, fn func(dir string)) error {
-	jam.Clean()
-	defer jam.Clean()
 	ogp, err := envy.MustGet("GOPATH")
 	defer envy.MustSet("GOPATH", ogp)
 	gp := os.TempDir()

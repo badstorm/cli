@@ -2,11 +2,17 @@ package actions
 
 import (
 	"github.com/gobuffalo/buffalo/render"
-	"github.com/gobuffalo/packr/v2"
+	"github.com/paganotoni/fsbox"
+
+	"coke"
 )
 
-var r *render.Engine
-var assetsBox = packr.NewBox("app:assets", "../public")
+var (
+	r *render.Engine
+
+	assetsBox    = fsbox.New(coke.Assets, "public")
+	templatesBox = fsbox.New(coke.Templates, "templates")
+)
 
 func init() {
 	r = render.New(render.Options{
@@ -14,7 +20,7 @@ func init() {
 		HTMLLayout: "application.plush.html",
 
 		// Box containing all of the templates:
-		TemplatesBox: packr.New("../templates", "../templates"),
+		TemplatesBox: templatesBox,
 		AssetsBox:    assetsBox,
 
 		// Add template helpers here:

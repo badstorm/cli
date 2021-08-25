@@ -12,7 +12,7 @@ func transformMain(opts *Options) genny.RunFn {
 		opts.rollback = &sync.Map{}
 	}
 	return func(r *genny.Runner) error {
-		f, err := r.FindFile("main.go")
+		f, err := r.FindFile("cmd/coke/main.go")
 		if err != nil {
 			return err
 		}

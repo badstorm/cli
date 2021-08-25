@@ -10,7 +10,6 @@ import (
 	"github.com/gobuffalo/events"
 	"github.com/gobuffalo/genny/v2"
 	"github.com/gobuffalo/genny/v2/plushgen"
-	"github.com/gobuffalo/packr/v2/jam"
 	"github.com/gobuffalo/plush/v4"
 )
 
@@ -84,10 +83,6 @@ func New(opts *Options) (*genny.Generator, error) {
 		}
 		g.Merge(dg)
 	}
-
-	g.RunFn(func(r *genny.Runner) error {
-		return jam.Pack(jam.PackOptions{})
-	})
 
 	// create the final go build command
 	c, err := buildCmd(opts)
