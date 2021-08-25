@@ -17,7 +17,7 @@ func New(opts *Options) (*genny.Generator, error) {
 
 	g.RunFn(appDetails(opts))
 	g.RunFn(configs(opts, filepath.Join(opts.App.Root, "config")))
-	// g.RunFn(pkgChecks(opts, opts.App.Root))
+	g.RunFn(pkgChecks(opts, opts.App.Root))
 
 	return g, nil
 }

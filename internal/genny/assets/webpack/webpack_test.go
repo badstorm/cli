@@ -44,11 +44,14 @@ func Test_Webpack_New(t *testing.T) {
 		"assets/js/application.js",
 		"package.json",
 		"postcss.config.js",
+		"public/assets/.keep",
 		"templates/application.plush.html",
 		"templates/assets",
 		"templates/assets/css",
 		"templates/assets/images",
 		"templates/assets/js",
+		"templates/public",
+		"templates/public/assets",
 		"webpack.config.js",
 	}
 
@@ -75,7 +78,7 @@ func Test_Webpack_New_WithYarn(t *testing.T) {
 	res := run.Results()
 	r.Len(res.Commands, 1)
 
-	r.Len(res.Files, 13)
+	r.Len(res.Files, 16)
 
 	c := res.Commands[0]
 	r.Equal("yarnpkg install --no-progress --save", strings.Join(c.Args, " "))

@@ -1,7 +1,6 @@
 package standard
 
 import (
-	"fmt"
 	"testing"
 
 	"github.com/gobuffalo/genny/v2"
@@ -38,14 +37,6 @@ func Test_New(t *testing.T) {
 		"templates/public",
 		"templates/public/assets",
 		"templates/public/assets/images",
-	}
-
-	// for i, f := range res.Files {
-	// 	r.Equal(files[i], f.Name())
-	// }
-
-	for _, v := range res.Files {
-		fmt.Println(v.Name())
 	}
 
 	for i, f := range res.Files {

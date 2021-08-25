@@ -1,8 +1,10 @@
 package info
 
 import (
+	"fmt"
 	"io/fs"
 	"io/ioutil"
+	"os"
 	"path"
 	"path/filepath"
 
@@ -18,7 +20,13 @@ type ListWalker interface {
 
 func configs(opts *Options, root string) genny.RunFn {
 	return func(r *genny.Runner) error {
-		return filepath.WalkDir(root, func(p string, d fs.DirEntry, err error) error {
+		if _, err := os.Stat(root); err != nil {
+			opts.Out.WriteString(fmt.Sprintf("%s does not exist, skipping configs\n", root))
+
+			return nil
+		}
+
+		errg := filepath.WalkDir(root, func(p string, d fs.DirEntry, err error) error {
 			if d.IsDir() {
 				return nil
 			}
@@ -33,5 +41,7 @@ func configs(opts *Options, root string) genny.RunFn {
 
 			return nil
 		})
+
+		return errg
 	}
 }
