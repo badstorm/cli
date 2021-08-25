@@ -83,12 +83,12 @@ func PackageJSONCheck(r *Runner) error {
 
 	box := webpack.Templates
 
-	f, err := box.FindString("package.json.tmpl")
+	f, err := box.ReadFile("package.json.tmpl")
 	if err != nil {
 		return err
 	}
 
-	tmpl, err := template.New("package.json").Parse(f)
+	tmpl, err := template.New("package.json").Parse(string(f))
 	if err != nil {
 		return err
 	}
@@ -99,7 +99,7 @@ func PackageJSONCheck(r *Runner) error {
 			App: r.App,
 		},
 	})
-	
+
 	if err != nil {
 		return err
 	}

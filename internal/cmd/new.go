@@ -100,9 +100,7 @@ func parseNewOptions(args []string) (newAppOptions, error) {
 
 	x := viper.GetString("docker")
 	if len(x) > 0 && x != "none" {
-		opts.Docker = &docker.Options{
-			Style: x,
-		}
+		opts.Docker = &docker.Options{}
 		app.WithDocker = true
 	}
 

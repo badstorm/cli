@@ -23,12 +23,12 @@ func WebpackCheck(r *Runner) error {
 
 	box := webpack.Templates
 
-	f, err := box.FindString("webpack.config.js.tmpl")
+	f, err := box.ReadFile("webpack.config.js.tmpl")
 	if err != nil {
 		return err
 	}
 
-	tmpl, err := template.New("webpack").Parse(f)
+	tmpl, err := template.New("webpack").Parse(string(f))
 	if err != nil {
 		return err
 	}

@@ -16,7 +16,7 @@ import (
 
 var (
 	//go:embed templates
-	templates embed.FS
+	Templates embed.FS
 
 	BinPath = func() string {
 		s := filepath.Join("node_modules", ".bin", "webpack")
@@ -48,7 +48,7 @@ func New(opts *Options) (*genny.Generator, error) {
 		return nil
 	})
 
-	g.Box(fsbox.New(templates, "templates", fsbox.OptionFSIgnoreGoEnv))
+	g.Box(fsbox.New(Templates, "templates", fsbox.OptionFSIgnoreGoEnv))
 
 	data := map[string]interface{}{
 		"opts": opts,

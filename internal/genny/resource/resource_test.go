@@ -80,12 +80,16 @@ func Test_New(t *testing.T) {
 				r.NoError(err)
 			}
 
-			exp := fsbox.New(testdata, path.Join("testdata", tt.Name))
-			gentest.CompareFiles(exp.List(), res.Files)
+			prefix := path.Join("testdata", tt.Name)
+			exp := fsbox.New(testdata, prefix)
 
 			for _, n := range exp.List() {
-				n = strings.Replace(n, "\\", "/", -1)
-				f, err := res.Find(strings.TrimSuffix(n, ".tmpl"))
+				nf := strings.Replace(n, "\\", "/", -1)
+				nf = strings.TrimSuffix(nf, ".tmpl")
+				nf = strings.TrimPrefix(nf, prefix)
+				nf = strings.TrimPrefix(nf, "/")
+
+				f, err := res.Find(nf)
 				r.NoError(err)
 				s, err := exp.FindString(n)
 				r.NoError(err)
